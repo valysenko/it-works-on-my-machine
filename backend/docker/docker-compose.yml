@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  devops-redis:
+    image: redis:8.0-alpine
+    restart: always
+    volumes:
+      - devops-redis-data:/data
+    networks:
+      - devops-backend-network
+  devops-postgres:
+    image: postgres:17.2-alpine
+    restart: always
+    volumes:
+      - devops-postgres-data:/var/lib/postgresql/data
+      - ../db_schema.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 15439:5432
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      SCHEMA: ${POSTGRES_SCHEMA}
+      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
+    command: ["postgres", "-c", "wal_level=logical"]
+    networks:
+      - devops-backend-network
+  devops-backend:
+    restart: always
+    tty: true
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./:/src
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      DEBUG: true
+      DB_ENDPOINT: devops-postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASS: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      REDIS_ENDPOINT: devops-redis
+      REDIS_PORT: 6379
+    networks:
+      - devops-backend-network
+    depends_on:
+      - devops-redis
+      - devops-postgres
+
+networks:
+  devops-backend-network:
+    name: devops-backend-network
+
+volumes:
+  devops-postgres-data:
+    driver: local
+  devops-redis-data:

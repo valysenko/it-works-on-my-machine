@@ -93,8 +93,6 @@ func videosGetHandler(ctx *gin.Context) {
 		err = json.Unmarshal([]byte(val), &videos)
 		if err == nil {
 			slog.Warn("Fetched videos from Redis", "count", len(videos))
-			ctx.JSON(http.StatusOK, videos)
-			return
 		}
 		slog.Warn("Failed to unmarshal Redis data", "error", err)
 	}

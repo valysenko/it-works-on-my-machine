@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 )
 
 func main() {
@@ -28,6 +29,9 @@ func main() {
 	// Server
 	log.Println("Starting server...")
 	router := gin.New()
+	router.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"*"},
+      }))
 	router.GET("/fibonacci", fibonacciHandler)
 	router.POST("/video", videoPostHandler)
 	router.GET("/videos", videosGetHandler)
