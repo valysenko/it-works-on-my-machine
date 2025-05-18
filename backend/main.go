@@ -16,6 +16,13 @@ import (
 	"github.com/gin-contrib/cors"
 )
 
+// func ReferrerPolicyMiddleware() gin.HandlerFunc {
+//     return func(c *gin.Context) {
+//         c.Writer.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+//         c.Next()
+//     }
+// }
+
 func main() {
 	log.SetOutput(os.Stderr)
 	if os.Getenv("DEBUG") == "true" {
@@ -31,7 +38,10 @@ func main() {
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
         AllowOrigins:     []string{"*"},
+        AllowHeaders:     []string{"*"},
+//         ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods"},
       }))
+//     router.Use(ReferrerPolicyMiddleware())
 	router.GET("/fibonacci", fibonacciHandler)
 	router.POST("/video", videoPostHandler)
 	router.GET("/videos", videosGetHandler)

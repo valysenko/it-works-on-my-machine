@@ -8,12 +8,16 @@ services:
     volumes:
       - ./:/src
     environment:
+      # seems like in mac "localhost" is a host, not container localhost
+      # was not able to access using http://devops-backend:8080
+      # was not able to access using http://host.docker.internal:8080
       REACT_APP_BACKEND_URL: http://localhost:8080
     ports:
       - "3000:3000"
     networks:
-      - devops-frontend-network
+      - devops-network
 
-networks:
-  devops-frontend-network:
-    name: devops-frontend-network
+#networks: # for run in separate files
+#  devops-network:
+#    name: devops-network
+#    external: true

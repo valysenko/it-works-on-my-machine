@@ -6,7 +6,7 @@ services:
     volumes:
       - devops-redis-data:/data
     networks:
-      - devops-backend-network
+      - devops-network
   devops-postgres:
     image: postgres:17.2-alpine
     restart: always
@@ -23,10 +23,11 @@ services:
       POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
     command: ["postgres", "-c", "wal_level=logical"]
     networks:
-      - devops-backend-network
+      - devops-network
   devops-backend:
     restart: always
-    tty: true
+    container_name: devops-backend
+    hostname: devops-backend
     build:
       context: ../
       dockerfile: docker/Dockerfile
@@ -45,16 +46,18 @@ services:
       REDIS_ENDPOINT: devops-redis
       REDIS_PORT: 6379
     networks:
-      - devops-backend-network
+      - devops-network
     depends_on:
       - devops-redis
       - devops-postgres
 
-networks:
-  devops-backend-network:
-    name: devops-backend-network
+#networks: # for run in separate files
+#  devops-network:
+#    name: devops-network
+#    external: true
 
 volumes:
   devops-postgres-data:
+    name: devops-postgres-data
     driver: local
   devops-redis-data:
