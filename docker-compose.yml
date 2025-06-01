@@ -1,0 +1,7 @@
+include:
+  - backend/docker/docker-compose.yml
+  - frontend/docker/docker-compose.yml
+
+networks:
+  devops-network:
+    name: devops-network
