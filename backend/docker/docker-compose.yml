@@ -26,6 +26,7 @@ services:
       - devops-network
   devops-backend:
     restart: always
+    tty: true
     container_name: devops-backend
     hostname: devops-backend
     build:
@@ -45,11 +46,20 @@ services:
       DB_NAME: ${POSTGRES_DB}
       REDIS_ENDPOINT: devops-redis
       REDIS_PORT: 6379
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://0.0.0.0:3100/loki/api/v1/push"
+        loki-batch-size: "100"
+        loki-retries: 2
+        loki-max-backoff: 1000ms
+        loki-timeout: 1s
     networks:
       - devops-network
     depends_on:
       - devops-redis
       - devops-postgres
+      - loki
 
 #networks: # for run in separate files
 #  devops-network:

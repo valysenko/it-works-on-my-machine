@@ -9,11 +9,13 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // func ReferrerPolicyMiddleware() gin.HandlerFunc {
@@ -22,6 +24,35 @@ import (
 //         c.Next()
 //     }
 // }
+
+func metricsMiddleware(ms *MetricsService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		start := time.Now()
+
+		c.Next()
+
+		duration := time.Since(start).Seconds()
+
+		path := c.FullPath()
+		if path == "" {
+			path = c.Request.URL.Path
+		}
+		method := c.Request.Method
+
+		// total requests
+		ms.IncrementTotalRequests(method, path)
+
+		// request duration
+		ms.ObserveRequestDuration(duration, method, path)
+
+		// request errors
+		status := c.Writer.Status()
+		if status >= 500 {
+			ms.IncrementFailedRequests(method, path, strconv.Itoa(c.Writer.Status()))
+		}
+	}
+}
 
 func main() {
 	log.SetOutput(os.Stderr)
@@ -33,15 +64,22 @@ func main() {
 		go func() { memoryLeak(0, 0) }()
 	}
 
+	// monitoring
+	ms := NewMetricsService()
+	metricsHandler := promhttp.HandlerFor(ms.Registry(), promhttp.HandlerOpts{})
+	defaultMetricsHandler := promhttp.Handler()
+
 	// Server
 	log.Println("Starting server...")
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"*"},
-        AllowHeaders:     []string{"*"},
-//         ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods"},
-      }))
-//     router.Use(ReferrerPolicyMiddleware())
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{"*"},
+		//         ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods"},
+	}))
+	router.Use(metricsMiddleware(ms)) // request metrics are updated here
+	router.GET("/metrics", gin.WrapH(metricsHandler))
+	router.GET("/default-metrics", gin.WrapH(defaultMetricsHandler))
 	router.GET("/fibonacci", fibonacciHandler)
 	router.POST("/video", videoPostHandler)
 	router.GET("/videos", videosGetHandler)

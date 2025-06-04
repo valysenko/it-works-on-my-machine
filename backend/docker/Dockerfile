@@ -2,7 +2,7 @@ FROM golang:1.24.3-alpine3.20 AS builder
 
 WORKDIR /src
 
-COPY main.go fibonacci.go memory.go ping.go root.go video.go ./
+COPY main.go monitoring.go fibonacci.go memory.go ping.go root.go video.go ./
 COPY go.mod go.sum ./
 RUN go mod download
 RUN go mod verify

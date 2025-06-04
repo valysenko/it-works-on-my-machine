@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -139,6 +139,8 @@ func getVideosFromFile() ([]Video, error) {
 		return videos, err
 	}
 	err = yaml.Unmarshal(yamlData, &videos)
+
+	log.Println("processed get videos request")
 	return videos, err
 }
 
@@ -146,12 +148,18 @@ func videoPostHandler(ctx *gin.Context) {
 	slog.Debug("Handling request", "URI", ctx.Request.RequestURI)
 	id := ctx.Query("id")
 	if len(id) == 0 {
-		httpErrorBadRequest(errors.New("id is empty"), ctx)
+		//httpErrorBadRequest(errors.New("id is empty"), ctx)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
+		})
 		return
 	}
 	title := ctx.Query("title")
 	if len(title) == 0 {
-		httpErrorBadRequest(errors.New("title is empty"), ctx)
+		//httpErrorBadRequest(errors.New("title is empty"), ctx)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
+		})
 		return
 	}
 	video := &Video{
@@ -186,6 +194,8 @@ func videoPostHandler(ctx *gin.Context) {
 			return
 		}
 	}
+
+	log.Println("processed post video request")
 }
 
 func getRedis() (*redis.Client, error) {

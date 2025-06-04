@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    hostname: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/loki-config.yaml
+    command: -config.file=/etc/loki/loki-config.yaml
+    networks:
+      - devops-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - devops-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    depends_on:
+      - loki
+      - prometheus
+    networks:
+      - devops-network
+
+# was not able to run on MAC docker desktop
+#  promtail:
+#    image: grafana/promtail:latest
+#    volumes:
+#      - ./promtail-config.yml:/etc/promtail/promtail-config.yaml
+##      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    depends_on: [loki]
+#    networks:
+#      - devops-network
