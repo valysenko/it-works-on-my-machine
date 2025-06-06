@@ -3,11 +3,6 @@ global:
   evaluation_interval: 15s
   # scrape_timeout is set to the global default (10s).
 
-#  # Attach these labels to any time series or alerts when communicating with
-#  # external systems (federation, remote storage, Alertmanager).
-#  external_labels:
-#    monitor: "codelab-monitor"
-
 scrape_configs:
   - job_name: prometheus
     static_configs:
@@ -25,3 +20,9 @@ scrape_configs:
     metrics_path: /default-metrics
     static_configs:
       - targets: ["host.docker.internal:8080"]
+
+  - job_name: 'cadvisor'
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - cadvisor:8080

@@ -20,6 +20,8 @@ services:
       - 9090:9090
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - cadvisor
     networks:
       - devops-network
 
@@ -35,13 +37,31 @@ services:
     networks:
       - devops-network
 
-# was not able to run on MAC docker desktop
-#  promtail:
-#    image: grafana/promtail:latest
-#    volumes:
-#      - ./promtail-config.yml:/etc/promtail/promtail-config.yaml
-##      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    depends_on: [loki]
-#    networks:
-#      - devops-network
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8087:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+    networks:
+      - devops-network
+
+# useful links:
+#  https://medium.com/@0xape/golang-logging-with-grafana-loki-71f01a1ec749
+#  https://ruanbekker.medium.com/logging-with-docker-promtail-and-grafana-loki-d920fd790ca8
+#  https://community.grafana.com/t/hello-world-test-for-loki-promtail-and-grafana/90762
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/promtail-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on: [loki]
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    networks:
+      - devops-network

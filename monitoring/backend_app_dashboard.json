@@ -308,7 +308,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "100 * (\n  sum(rate(http_requests_errors_total[5m]))\n  /\n  clamp_min(sum(rate(http_requests_total[5m])), 1)\n)",
+          "expr": "100 * sum(rate(http_requests_errors_total[5m]))\n/\n(sum(rate(http_requests_total[5m])))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -374,7 +374,32 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "{method=\"/video\", path=\"POST\"}"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -404,7 +429,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "100 *\n  sum(rate(http_requests_errors_total[5m])) by (method, path)\n/\n  clamp_min(sum(rate(http_requests_total[5m])) by (method, path), 1)",
+          "expr": "100 *\n  sum(rate(http_requests_errors_total[5m])) by (method, path)\n/\n  sum(rate(http_requests_total[5m])) by (method, path)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "B"
@@ -517,34 +542,13 @@
     },
     {
       "datasource": {
-        "type": "loki",
-        "uid": "P8E80F9AEF21F6940"
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -558,7 +562,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "decmbytes"
         },
         "overrides": []
       },
@@ -570,39 +575,36 @@
       },
       "id": 4,
       "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
+        "minVizHeight": 75,
+        "minVizWidth": 75,
         "orientation": "auto",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
       },
       "pluginVersion": "12.0.1",
       "targets": [
         {
-          "direction": "backward",
-          "editorMode": "builder",
-          "expr": "",
-          "queryType": "range",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "app_memory_bytes_usage/1000000",
+          "legendFormat": "__auto",
+          "range": true,
           "refId": "A"
         }
       ],
       "title": "application memory usage",
-      "type": "barchart"
+      "type": "gauge"
     }
   ],
   "preload": false,
@@ -619,5 +621,5 @@
   "timezone": "browser",
   "title": "Backend app",
   "uid": "4e0716ef-c638-4a94-a622-0596496aa206",
-  "version": 19
+  "version": 24
 }
