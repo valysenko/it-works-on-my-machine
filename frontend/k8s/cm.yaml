@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-env-config
+data:
+  REACT_APP_BACKEND_URL: "http://ec2-13-62-58-152.eu-north-1.compute.amazonaws.com:30081"
