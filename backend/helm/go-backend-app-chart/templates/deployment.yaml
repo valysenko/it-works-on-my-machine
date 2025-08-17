@@ -21,7 +21,8 @@ spec:
             - containerPort: 8080
           envFrom:
             - configMapRef:
-               name: {{ .Release.Name }}-backend-env-config
+#               name: {{ .Release.Name }}-backend-env-config
+               name: backend-env-config
           env:
           - name: DB_PASS
             valueFrom:
