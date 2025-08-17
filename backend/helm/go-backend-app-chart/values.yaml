@@ -1,0 +1,26 @@
+replicaCount: 1
+
+postgresql:
+  enabled: true
+  auth:
+    enablePostgresUser: true
+    database: devops-course
+    existingSecret: "{{ .Release.Name }}-postgresql-secret"
+  primary:
+    initdb:
+      existingConfigmap: "{{ .Release.Name }}-db-init-script"
+    extendedConfiguration: |
+      ssl = off
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+  replica:
+    replicaCount: 0
+  sentinel:
+    enabled: false
