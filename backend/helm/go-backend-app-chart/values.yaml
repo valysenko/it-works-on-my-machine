@@ -8,7 +8,7 @@ postgresql:
     existingSecret: "{{ .Release.Name }}-postgresql-secret"
   primary:
     initdb:
-      existingConfigmap: "{{ .Release.Name }}-db-init-script"
+      scriptsConfigMap: "{{ .Release.Name }}-db-init-script"
     extendedConfiguration: |
       ssl = off
 
