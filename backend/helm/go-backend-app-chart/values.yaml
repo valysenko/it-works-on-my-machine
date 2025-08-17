@@ -17,6 +17,8 @@ redis:
   architecture: standalone
   auth:
     enabled: false
+  tls:
+    enabled: true
   master:
     persistence:
       enabled: false
