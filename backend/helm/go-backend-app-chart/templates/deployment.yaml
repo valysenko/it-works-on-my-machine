@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend-app
-          image: vlysenkoamo/docker-devops-backend:v1.3
+          image: vlysenkoamo/docker-devops-backend:v1.4
           ports:
             - containerPort: 8080
           envFrom:

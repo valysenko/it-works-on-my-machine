@@ -8,13 +8,13 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"crypto/tls"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
 	"github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v3"
 )
+// 	"crypto/tls"
 
 var dbSession *pg.DB = nil
 
@@ -27,6 +27,7 @@ func getDB(c *gin.Context) *pg.DB {
 	if dbSession != nil {
 		return dbSession
 	}
+
 	endpoint := os.Getenv("DB_ENDPOINT")
 	if len(endpoint) == 0 {
 		slog.Error("Environment variable `DB_ENDPOINT` is empty")
@@ -215,6 +216,6 @@ func getRedis() (*redis.Client, error) {
 		Addr:     fmt.Sprintf("%s:%s", endpoint, port),
 		Password: "", // no password set
 		DB:       0,  // use default DB
-		TLSConfig: &tls.Config{InsecureSkipVerify: true},
+// 		TLSConfig: &tls.Config{InsecureSkipVerify: true},
 	}), nil
 }
