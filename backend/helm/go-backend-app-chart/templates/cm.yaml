@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: backend-env-config
-#  name: "{{ .Release.Name }}-backend-env-config"
+  name: "{{ .Release.Name }}-backend-env-config"
 data:
   PORT: "8080"
   DEBUG: "true"
