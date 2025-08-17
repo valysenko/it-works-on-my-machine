@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-db-init-script"
+data:
+  init.sql: |-
+    {{ .Files.Get "db_schema_init.sql" | nindent 4 }}

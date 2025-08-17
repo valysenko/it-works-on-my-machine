@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-frontend-deployment
+  labels:
+    app: {{.Release.Name}}-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-frontend # deployment manages pods with such label
+  template: # template for the pods
+    metadata:
+      labels:
+        app: {{.Release.Name}}-frontend
+    spec:
+      containers:
+        - name: {{.Release.Name}}-frontend-app
+          image: vlysenkoamo/docker-devops-frontend:v1.2
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: {{.Release.Name}}-frontend-env-config

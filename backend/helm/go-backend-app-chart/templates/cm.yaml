@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-backend-env-config"
+data:
+  PORT: "8080"
+  DEBUG: "true"
+  DB_ENDPOINT: "{{ .Release.Name }}-postgresql"
+  DB_PORT: "5432"
+  DB_USER: "postgres"
+#  DB_PASS: ""
+  DB_NAME: "{{ .Values.postgresql.auth.database }}"
+  REDIS_ENDPOINT: "{{ .Release.Name }}-redis-master"
+  REDIS_PORT: "6379"

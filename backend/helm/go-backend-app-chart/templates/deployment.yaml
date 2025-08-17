@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-backend-deployment
+  labels:
+    app: {{.Release.Name}}-backend
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-backend # deployment manages pods with such label
+  template: # template for the pods
+    metadata:
+      labels:
+        app: {{.Release.Name}}-backend
+    spec:
+      containers:
+        - name: backend-app
+          image: vlysenkoamo/docker-devops-backend:v1.4
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+               name: {{ .Release.Name }}-backend-env-config
+          env:
+          - name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-postgresql-secret
+                key: postgres-password
